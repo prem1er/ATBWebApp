@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+  <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+    <param name="Target" value="System.out" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{MM-dd-yyyy - HH:mm:ss.SSS} [%p] %M - %m%n" />
+    </layout>
+  </appender>
+
+  <appender name="STDERR" class="org.apache.log4j.ConsoleAppender">
+    <param name="Target" value="System.err" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{MM-dd-yyyy - HH:mm:ss.SSS} [%p] %M - %m%n" />
+    </layout> 
+    <filter class="org.apache.log4j.varia.LevelRangeFilter">
+      <param name="LevelMin" value="ERROR" /> 
+      <param name="LevelMax" value="FATAL" />
+    </filter>
+  </appender>
+
+  <appender name="ATB" class="org.apache.log4j.DailyRollingFileAppender">
+    <param name="File" value="/var/lib/atb-web-app/ATBWebAppLogger.log" />
+    <param name="DatePattern" value="'.' MM-dd-yyyy" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{MM-dd-yyyy - HH:mm:ss.SSS} [%p] %M - %m%n" />
+    </layout>
+  </appender>
+
+  <category name="com.app">
+    <priority value="trace" />
+    <appender-ref ref="ATB" />
+    <appender-ref ref="STDOUT" />
+  </category>
+  
+  <category name="org.springframework">
+    <priority value="ERROR" />
+    <appender-ref ref="ATB" />
+    <appender-ref ref="STDOUT" />
+  </category>
+  
+  <category name="javax.ws">
+    <priority value="ERROR" />
+    <appender-ref ref="ATB" />
+    <appender-ref ref="STDOUT" />
+  </category>
+
+  <root>
+    <priority value="ERROR" />
+    <appender-ref ref="STDERR" />
+  </root>
+      
+</log4j:configuration>

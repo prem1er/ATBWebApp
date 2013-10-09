@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/util
+	http://www.springframework.org/schema/util/spring-util-3.0.xsd">	
+	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<value>classpath:*jdbc.properties</value>
+		</property>
+	</bean>
+	
+	<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
+		<property name="driverClassname" value="${jdbc.driverClassname}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="user" value="${jdbc.user}"/>
+		<property name="password" value="${jdbc.password}"/>
+	</bean>
+	
+	<bean class="com.spring.service.dao.UserServiceDAOImpl" id ="userServiceDAO">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<bean class="com.spring.service.dao.ServiceBaseDAOImpl" id="serviceBaseDAO"></bean>
+</beans>

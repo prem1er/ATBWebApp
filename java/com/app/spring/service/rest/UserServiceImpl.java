@@ -9,7 +9,6 @@ import com.app.spring.service.dao.UserServiceDAO;
 import com.app.spring.service.model.ResponseBase;
 import com.app.spring.service.model.ResponseUserData;
 import com.app.spring.service.model.UserData;
-import com.sun.xml.bind.v2.runtime.reflect.opt.Const;
 
 public class UserServiceImpl implements UserService {
    
@@ -60,7 +59,7 @@ public class UserServiceImpl implements UserService {
 			getLog().info("End call: createUser");
 			
 			response.setResponseCode(Constants.RESPONSE_CODE_OK);
-			response.setResponseMessage("User created successfully. Follow the instruction in the email to activate.");
+			response.setResponseMessage("User created successfully. An activation email was sent.");
 		} catch(ServiceException anEx) {
 			response.setResponseError(anEx.getMessage());
 		}
@@ -68,12 +67,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseBase verifyUserName(String pUserName) {
+	public ResponseBase validateUserName(String pUserName) {
 		getLog().info("Calling service: verifyUserName; [User Name: " + pUserName + "]");
 		
 		ResponseBase response = new ResponseBase();
 		try {
-			int userId = this.userServiceDAO.verifyUserName(pUserName);
+			int userId = this.userServiceDAO.validateUserName(pUserName);
 			getLog().info("End call: verifyUser");
 			
 			if (userId > 0) {
@@ -91,24 +90,27 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public ResponseBase getValidAccounts(String pFirstName, String pLastName,
-         String pEmail, String pUserName, String pOrigPass, String pVerifyPass) {
-      ResponseBase response = new ResponseBase();
-      try {
-         if(!pOrigPass.equals(pVerifyPass)) {
-            throw new ServiceException(Constants.RESPONSE_CODE_ERROR, Constants.RESPONSE_MESSAGE_PASSWORD_MATCH);
-         }
-         
-         //String encryptedPass = this.getUserServiceDAO().getEncryptedPassword(pOrigPass);
-        //this.getUserServiceDAO().createUser(pFirstName, pLastName, pEmail, pUserName, encryptedPass);
-         
-         response.setResponseOk();
-         
-      } catch(ServiceException anEx) {
-         
-      }
-      return response;
-   }
+	public ResponseBase validateEmail(String pEmail) {
+		getLog().info("Calling service: validateEmail; [Email: " + pEmail + "]");
+		ResponseBase response = new ResponseBase();
+		
+		try {
+			String email = this.getUserServiceDAO().validateEmail(pEmail);
+			getLog().info("End call: validateEmail");
+			
+			if(email.length() > 0) {
+				response.setResponseCode(Constants.RESPONSE_CODE_CONFLICT);
+				response.setResponseMessage(Constants.RESPONSE_MESSAGE_EMAIL_EXISTS);
+			} else if(email.length() == 0) {
+				response.setResponseOk();
+			}
+		} catch (ServiceException anEx) {
+			getLog().error(anEx.getMessage());
+			response.setResponseMessage(anEx.getMessage());
+		}
+		
+		return response;
+	}
 	
     public UserServiceDAO getUserServiceDAO() {
 		return this.userServiceDAO;

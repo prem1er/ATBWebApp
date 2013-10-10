@@ -9,5 +9,7 @@ public interface UserServiceDAO extends ServiceBaseDAO {
 	
 	public void createUser(UserData pUserData) throws ServiceException;
 	
-	public int verifyUserName(String pUserName) throws ServiceException;
+	public int validateUserName(String pUserName) throws ServiceException;
+	
+	public String validateEmail(String pEmail) throws ServiceException;
 }

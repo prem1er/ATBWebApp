@@ -14,8 +14,9 @@ public interface Constants {
    public static final String RESPONSE_MESSAGE_UNAUTHORIZED = "Unauthorized Access";
    public static final String RESPONSE_MESSAGE_PASSWORD_MATCH = "Passwords Don't Match";
    public static final String RESPONSE_MESSAGE_SYSTEM_ERROR = "System Error";
-   public static final String RESPONSE_MESSAGE_USER_EXISTS = "User Name already exists.";
-   public static final String RESPONSE_MESSAGE_VALID_USER = "Valid User Name";
+   public static final String RESPONSE_MESSAGE_USER_EXISTS = "User Name exists or is invalid";
+   public static final String RESPONSE_MESSAGE_EMAIL_EXISTS = "Email address exists or is invalid";
+   public static final String RESPONSE_MESSAGE_SUBMIT_ERROR = "Error submitting form";
 
    //DB Tables
    public static final String TABLE_USERS = "users";

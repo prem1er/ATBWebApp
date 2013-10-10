@@ -14,14 +14,6 @@ import com.app.spring.service.model.ResponseUserData;
 @Path("/userservice")
 public interface UserService {
 
-     @GET
-     @Path("/getValidAccounts")
-     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-     @Produces(MediaType.APPLICATION_JSON)
-     public ResponseBase getValidAccounts(@FormParam("firstName") String pFirstName, @FormParam("lastName") String pLastName, 
-           @FormParam("email") String pEmail, @FormParam("userName") String pUserName, @FormParam("origPass") String pOrigPass, 
-           @FormParam("verifyPass") String pVerifyPass);
-     
      @POST
      @Path("/createUser")
      @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -37,8 +29,14 @@ public interface UserService {
      public ResponseUserData getUserInfo(@FormParam("userId") String pUserId);
      
      @POST
-     @Path("/verifyUserName")
+     @Path("/validateUserName")
      @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
      @Produces(MediaType.APPLICATION_JSON)
-     public ResponseBase verifyUserName(@FormParam("userName") String pUserName);
+     public ResponseBase validateUserName(@FormParam("userName") String pUserName);
+     
+     @POST
+     @Path("validateEmail")
+     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+     @Produces(MediaType.APPLICATION_JSON)
+     public ResponseBase validateEmail(@FormParam("email") String pEmail);
 }

@@ -24,8 +24,9 @@
 	
 	<security:http use-expressions="true" entry-point-ref="resourceAuthEntry" >
 	    <security:intercept-url pattern="/login.jsp" access="permitAll" />
-	    <security:intercept-url pattern="/rest/userservice/createUser" access="permitAll"/>
-	    <security:intercept-url pattern="/rest/userservice/verifyUserName" access="permitAll"/>
+	    <security:intercept-url pattern="/rest/userservice/createUser" access="permitAll" />
+	    <security:intercept-url pattern="/rest/userservice/validateUserName" access="permitAll" />
+	    <security:intercept-url pattern="/rest/userservice/validateEmail" access="permitAll" />
 	    <security:intercept-url pattern="/ext/**" access="permitAll" />
 	    <security:intercept-url pattern="/resources/**" access="permitAll" />
 	    <security:intercept-url pattern="/js/**" access="permitAll" />

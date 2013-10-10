@@ -10,6 +10,7 @@ import com.app.spring.dbmap.UserDataRowMapper;
 import com.app.spring.service.Constants;
 import com.app.spring.service.ServiceException;
 import com.app.spring.service.model.UserData;
+import com.sun.xml.bind.v2.runtime.reflect.opt.Const;
 
 public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServiceDAO {
 
@@ -28,6 +29,11 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 	
 	public void setUserRolesSchema(String pUserRolesSchema) {
 		this.userRolesSchema = pUserRolesSchema;
+	}
+	
+	public String getSQLSelectEmail() {
+		return "select " + Constants.USER_FIELD_EMAIL +
+			" from " + this.userSchema + " where " + Constants.USER_FIELD_EMAIL + " = ?";  
 	}
 	
 	public String getSQLSelectUser() {
@@ -69,9 +75,23 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 		super.setDataSource(pDataSource);
 	}
 	
+	@Override
+	public String validateEmail(String pEmail) throws ServiceException {
+		String email = "";
+		
+		try {
+			email = this.getEmail(pEmail);
+		} catch (EmptyResultDataAccessException anEx) {
+			return email;
+		} catch (Exception anEx) {
+			throw new ServiceException(Constants.RESPONSE_CODE_ERROR, Constants.RESPONSE_MESSAGE_SUBMIT_ERROR);
+		}
+		
+		return email;
+	}
 	
 	@Override
-	public int verifyUserName(String pUserName) throws ServiceException {
+	public int validateUserName(String pUserName) throws ServiceException {
 		int userId = 0;
 		try {
 			userId = this.getUserId(pUserName);
@@ -98,7 +118,7 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 			
 		} catch (DuplicateKeyException anEx) {
 			getLog().error(anEx.getMessage());
-			throw new ServiceException(Constants.RESPONSE_CODE_ERROR, Constants.RESPONSE_MESSAGE_USER_EXISTS);
+			throw new ServiceException(Constants.RESPONSE_CODE_ERROR, Constants.RESPONSE_MESSAGE_SUBMIT_ERROR);
 		} catch (Exception anEx) {
 			getLog().error(anEx.getMessage());
 			throw new ServiceException(Constants.RESPONSE_CODE_ERROR, Constants.RESPONSE_MESSAGE_SYSTEM_ERROR);
@@ -109,6 +129,10 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 		return this.getJdbcTemplate().queryForInt(this.getSQLSelectUserId(), new Object[]{pUserName});
 	}
 		
+	private String getEmail(String pEmail) throws Exception {
+		return (String) this.getJdbcTemplate().queryForObject(this.getSQLSelectEmail(), new Object[]{pEmail}, String.class);
+	}
+	
 	@Override
 	public UserData getUserInfo(String pUserId) throws ServiceException {
 		UserData user = null;

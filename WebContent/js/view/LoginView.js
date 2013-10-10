@@ -1,5 +1,5 @@
 Ext.onReady(function() {
-	var config = Ext.create('js.util.Config');
+	var restUrl = Ext.create('js.util.Config').getProdRestUrl();
 	
 	var registrationWindow = Ext.create('Ext.window.Window', {
 		title: 'User Registration',
@@ -59,8 +59,6 @@ Ext.onReady(function() {
     			}
     		},{
     			text: 'Submit',
-                formBind: true,
-                disabled: true,
     			handler: function() {
                     var formObj = this.up('form').getForm();
                     if(formObj.isValid()) {
@@ -70,7 +68,7 @@ Ext.onReady(function() {
                         var userNameVal = Ext.getCmp('userName').getValue();
                         var passwordVal = Ext.getCmp('password').getValue();
                         Ext.Ajax.request({
-                            url: config.getProdRestUrl() + '/userservice/createUser',
+                            url: restUrl + '/userservice/createUser',
                             method: 'POST',
                             scope: this,
                             params: {firstName: firstNameVal, lastName: lastNameVal, email: emailVal, 
@@ -80,6 +78,7 @@ Ext.onReady(function() {
                                 var responseCode = jsonObj.responseCode;
                                 if(responseCode == '200') {
                                     Ext.Msg.alert('Success', jsonObj.responseMessage);
+                                    registrationWindow.hide();
                                 } else {
                                     Ext.Msg.alert('Error', jsonObj.responseMessage);
                                 }
@@ -110,8 +109,8 @@ Ext.onReady(function() {
 			title: 'Login',
 			defaultType: 'textfield',
 			defaults: {
-				allowBlank: false,
-				msgTarget: 'side'
+				validateOnChange: false,
+				validateOnBlur: false
 			},
 			items: [{
 				fieldLabel: 'Username',
@@ -122,12 +121,17 @@ Ext.onReady(function() {
 				id: 'j_password'
 			}],
 			buttons: [{
+				text: 'Register',
+				handler: function() {
+					registrationWindow.show();
+				}
+			},{
 				text: 'Login',
 				handler: function() {
 					var user = Ext.getCmp('j_username').getValue();
 					var pass = Ext.getCmp('j_password').getValue();
 					Ext.Ajax.request({
-						url: config.getProdRestUrl() + '/j_spring_security_check',
+						url: restUrl + '/j_spring_security_check',
 						method: 'POST',
 						scope: this,
 						params: {j_username: user, j_password: pass},
@@ -145,29 +149,26 @@ Ext.onReady(function() {
 						}
 					});
 				}
-			},{
-				text: 'Register',
-				handler: function() {
-					registrationWindow.show();
-				}
 			}]
 		}]
 	});
 	
-	Ext.getCmp('userName').on('blur', function() {
-		 if(this.getRawValue().length >= 8 && this.getRawValue().length <= 15) {
-			 var userName = this.getValue();
+	Ext.getCmp('userName').on('change', function() {
+		 if(this.isValid()) {
+			 var userNameVal = this.getValue();
 			 
 			 Ext.Ajax.request({
-	             url: config.getProdRestUrl() + '/userservice/verifyUserName',
+	             url: restUrl + '/userservice/validateUserName',
 	             method: 'POST',
 	             scope: this,
-	             params: {userName: userName},
+	             params: {userName: userNameVal},
 	             success: function(response, request) {
 	                 var jsonObj = Ext.decode(response.responseText);
 	                 var responseCode = jsonObj.responseCode;
 	                 if(responseCode == '409'){
 	                    this.markInvalid(jsonObj.responseMessage);
+	                 } else if(responseCode == '200') {
+	                	 this.clearInvalid();
 	                 }
 	             },
 	             failure: function(request, response) {
@@ -176,6 +177,32 @@ Ext.onReady(function() {
 	         }); 
 		 }
 	});
+	
+	Ext.getCmp('email').on('change', function() {
+		if(this.isValid()) {
+			var emailVal = this.getValue();
+			
+			Ext.Ajax.request({
+				url: restUrl + '/userservice/validateEmail',
+				method: 'POST',
+				scope: this,
+				params: {email: emailVal},
+				success: function(response, request) {
+					var jsonObj = Ext.decode(response.responseText);
+					var responseCode = jsonObj.responseCode;
+					if(responseCode == '409') {
+						this.markInvalid(jsonObj.responseMessage);
+					} else if(responseCode == '200') {
+						this.clearInvalid();
+					}
+				},
+				failure: function(response, request) {
+					Ext.Msg.alert('Error', jsonObj.getResponseMessage);
+				}
+			});
+		}
+	});
+	
 	
 	registrationWindow.on('hide', function() {
 	    this.down('form').getForm().reset();

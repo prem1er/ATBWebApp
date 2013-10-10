@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
@@ -19,6 +20,13 @@ public class CustomAuthenticationEntryPoint extends LoginUrlAuthenticationEntryP
 	private static final String AJAX_REQUEST_HEADER = "XMLHttpRequest";
 	private static final String REQUEST_HEAD_FIELD = "X-Requested-With";
 	
+	private Logger log;
+	
+	public CustomAuthenticationEntryPoint() {
+		super();
+		this.log = Logger.getLogger(this.getClass());
+	}
+	
 	public void commence(HttpServletRequest pRequest, HttpServletResponse pResponse,
 			AuthenticationException pAuthException) throws IOException, ServletException {
 		
@@ -30,7 +38,12 @@ public class CustomAuthenticationEntryPoint extends LoginUrlAuthenticationEntryP
 			OutputStream out = pResponse.getOutputStream();
 			mapper.writeValue(out, responseBase);
 		} else {
+			this.log.info("Non-Authenticated Requested: [");
 			super.commence(pRequest, pResponse, pAuthException);
 		}
+	}
+	
+	private Logger getLog() {
+		return this.log;
 	}
 }

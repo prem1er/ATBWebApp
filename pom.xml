@@ -15,7 +15,6 @@
 	</properties>
 
 	<dependencies>
-	
 		 <dependency>
 			<groupId>asm</groupId>
 			<artifactId>asm</artifactId>
@@ -35,6 +34,19 @@
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>
 		</dependency>
+		
+		<dependency>
+		    <groupId>javax.mail</groupId>
+		    <artifactId>mail</artifactId>
+		    <version>1.4.3</version>
+		</dependency>
+		
+		<dependency>
+      		<groupId>org.jasypt</groupId>
+      		<artifactId>jasypt</artifactId>
+      		<version>1.9.1</version>
+      		<classifier>lite</classifier>
+   	 	</dependency>
 	
 		<!-- Spring -->
 	  <dependency>

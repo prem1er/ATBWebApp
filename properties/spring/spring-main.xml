@@ -9,7 +9,6 @@
 	http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
 	<util:map id="appConfigMap">
-		<entry key="serviceEndpoint" value="http://afterthebeep.us:8080/service/rest/"></entry>
 	</util:map>
 	
 	<import resource="spring-dao.xml"/>

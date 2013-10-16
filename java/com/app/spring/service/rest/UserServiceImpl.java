@@ -1,6 +1,7 @@
 package com.app.spring.service.rest;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.net.SMTPAppender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.app.spring.service.Constants;
@@ -9,10 +10,12 @@ import com.app.spring.service.dao.UserServiceDAO;
 import com.app.spring.service.model.ResponseBase;
 import com.app.spring.service.model.ResponseUserData;
 import com.app.spring.service.model.UserData;
+import com.app.spring.util.UserEmailUtil;
 
 public class UserServiceImpl implements UserService {
    
 	private UserServiceDAO userServiceDAO;
+	private UserEmailUtil userEmailUtil;
 	
 	private Logger log;
 	
@@ -112,7 +115,15 @@ public class UserServiceImpl implements UserService {
 		return response;
 	}
 	
-    public UserServiceDAO getUserServiceDAO() {
+    public UserEmailUtil getUserEmailUtil() {
+		return this.userEmailUtil;
+	}
+
+	public void setUserEmailUtil(UserEmailUtil userEmailUtil) {
+		this.userEmailUtil = userEmailUtil;
+	}
+
+	public UserServiceDAO getUserServiceDAO() {
 		return this.userServiceDAO;
 	}
 

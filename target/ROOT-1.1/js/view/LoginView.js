@@ -84,7 +84,7 @@ Ext.onReady(function() {
                                 }
                             },
                             failure: function(request, response) {
-                                Ext.Msg.alert('Error', jsonObj.responseMessage);
+                                Ext.Msg.alert('Error', 'System communication error');
                             }
                         });
                     }
@@ -145,7 +145,7 @@ Ext.onReady(function() {
 							}
 						},
 						failure: function(response, request) {
-							Ext.Msg.alert('Error', jsonObj.responseMessage);
+							Ext.Msg.alert('Error', 'System communication error');
 						}
 					});
 				}
@@ -172,7 +172,7 @@ Ext.onReady(function() {
 	                 }
 	             },
 	             failure: function(request, response) {
-	                 Ext.Msg.alert('Error', jsonObj.responseMessage);
+	            	 Ext.Msg.alert('Error', 'System communication error');
 	             }
 	         }); 
 		 }
@@ -197,7 +197,7 @@ Ext.onReady(function() {
 					}
 				},
 				failure: function(response, request) {
-					Ext.Msg.alert('Error', jsonObj.getResponseMessage);
+					Ext.Msg.alert('Error', 'System communication error');
 				}
 			});
 		}

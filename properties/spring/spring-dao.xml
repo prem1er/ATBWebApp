@@ -8,12 +8,6 @@
 	http://www.springframework.org/schema/util
 	http://www.springframework.org/schema/util/spring-util-3.0.xsd">	
 	
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations">
-			<value>classpath:*/jdbc.properties</value>
-		</property>
-	</bean>
-	
 	<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
 		<property name="driverClassName" value="${jdbc.driverClassname}"/>
 		<property name="url" value="${jdbc.url}"/>
@@ -35,5 +29,6 @@
 	    <property name="userSchema" value="${jdbc.userSchema}" />
 	    <property name="userRolesSchema" value="${jdbc.userRolesSchema}" />
 	    <property name="dataSource" ref="dataSource" />
+	    <property name="userEmailUtil" ref="userEmailUtil"></property>
 	</bean>
 </beans>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/security 
+	http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+	
+    <!-- Class responsible for successful login and subsequent redirect -->
+	<bean id="loginSuccessHandler" class="com.app.spring.security.LoginSuccessHandler"></bean>
+	
+	<!-- Class responsible for failed login -->
+	<bean id="loginFailureHandler" class="com.app.spring.security.LoginFailureHandler"></bean>
+	
+	<!-- Class responsible for handling calls to protected resources -->
+	<bean id="resourceAuthEntry" class="com.app.spring.security.CustomAuthenticationEntryPoint">
+		<property name="loginFormUrl" value="/login.jsp"></property>	    
+	</bean>
+	
+	<!-- Encoder to use for user password validation -->
+	<bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+	
+	<security:http use-expressions="true" entry-point-ref="resourceAuthEntry" >
+	    <security:intercept-url pattern="/login.jsp" access="permitAll" />
+	    <security:intercept-url pattern="/rest/userservice/createUser" access="permitAll" />
+	    <security:intercept-url pattern="/rest/userservice/validateUserName" access="permitAll" />
+	    <security:intercept-url pattern="/rest/userservice/validateEmail" access="permitAll" />
+	    <security:intercept-url pattern="/ext/**" access="permitAll" />
+	    <security:intercept-url pattern="/resources/**" access="permitAll" />
+	    <security:intercept-url pattern="/js/**" access="permitAll" />
+	    <security:intercept-url pattern="/rest/**" access="isAuthenticated()" />
+	    <security:intercept-url pattern="/**" access="isAuthenticated()" />
+		<security:form-login login-page="/login.jsp" 
+			authentication-success-handler-ref="loginSuccessHandler"
+			authentication-failure-handler-ref="loginFailureHandler"  />
+		<security:session-management>
+			<security:concurrency-control max-sessions="1" />
+		</security:session-management>
+	</security:http>
+
+	<security:authentication-manager alias="authenticationManager" >
+		<security:authentication-provider user-service-ref="userAuthenticationDAO" >
+		    <security:password-encoder ref="encoder"></security:password-encoder>
+		</security:authentication-provider>   
+	</security:authentication-manager> 
+</beans>

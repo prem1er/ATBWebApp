@@ -1,0 +1,81 @@
+package com.app.spring.util;
+
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
+import org.apache.log4j.Logger;
+
+import com.app.spring.service.Constants;
+import com.app.spring.service.ServiceException;
+import com.sun.jersey.api.MessageException;
+
+public class UserEmailUtil {
+    private String emailPass;
+    private String emailUser;
+    private String emailHost;
+    private String emailPort;
+
+    private String PROP_MAIL_HOST_NAME = "mail.smtp.host";
+    private String PROP_MAIL_PORT_NAME = "mail.smtp.port";
+    private String PROP_MAIL_AUTH_NAME = "mail.smtp.auth";
+    private String PROP_MAIL_TLS_NAME = "mail.smtp.starttls.enable";
+    private String PROP_MAIL_FROM_NAME = "mail.smtp.user";
+
+    private String PROP_MAIL_FROM_VALUE = "no-reply@afterthebeep.us";
+
+    private Logger log;
+
+    public UserEmailUtil(String pEmailUser, String pEmailPass, String pEmailHost, String pEmailPort) {
+		this.log = Logger.getLogger(this.getClass());
+        this.emailUser = pEmailUser;
+        this.emailPass = pEmailPass;
+        this.emailHost = pEmailHost;
+        this.emailPort = pEmailPort;
+    }
+
+    private Session getMailSession() {           
+        Properties props = new Properties();
+        props.put(PROP_MAIL_FROM_NAME, PROP_MAIL_FROM_VALUE);
+        props.put(PROP_MAIL_HOST_NAME, this.emailHost);
+        props.put(PROP_MAIL_PORT_NAME, this.emailPort);
+        props.put(PROP_MAIL_AUTH_NAME, true);
+        props.put(PROP_MAIL_TLS_NAME, true);
+
+        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(emailUser, emailPass);
+                }
+        });
+
+        return session;              
+    }       
+
+    protected void sendActivateUserEmail(String pUserEmail, int pUserId, String pUserName) throws ServiceException {
+        try {
+            getLog().info("Calling sendActivateUserEmail; [Email Address: " + pUserEmail + " User Id: " + pUserId + "]"); 
+
+            MimeMessage message = new MimeMessage(this.getMailSession());
+            message.setFrom(new InternetAddress(PROP_MAIL_FROM_VALUE));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(pUserEmail));
+            message.setSubject("Action required to activate user at afterthebeep");
+            message.setText("Thanks for registering with afterthebeep. Follow the below link to activate your account \n" +
+            		"for username: " + pUserName + "\n \n" +
+            		 "<a href=http://afterthebeep.us/activate.jsp?uid=" + pUserId + ">", "UTF-8", "html");
+            
+        } catch (MessagingException anEx) {
+            getLog().error(anEx.getMessage());
+            throw new ServiceException(Constants.RESPONSE_CODE_ERROR, Constants.RESPONSE_MESSAGE_SYSTEM_ERROR);
+        }
+    }
+
+    private Logger getLog() {
+        return this.log;
+    }
+}

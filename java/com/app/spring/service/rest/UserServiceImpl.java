@@ -1,7 +1,6 @@
 package com.app.spring.service.rest;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.net.SMTPAppender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.app.spring.service.Constants;
@@ -54,8 +53,10 @@ public class UserServiceImpl implements UserService {
 		
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		String hashedPassword = encoder.encode(pPassword);
-		
+		String hashedActivationId = encoder.encode(pEmail + pPassword);
+
 		newUser.setHashedPassword(hashedPassword);
+		newUser.setHashedActivationId(hashedActivationId);
 		
 		try {
 			this.userServiceDAO.createUser(newUser);

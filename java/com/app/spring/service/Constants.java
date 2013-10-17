@@ -29,6 +29,7 @@ public interface Constants {
    public static final String USER_FIELD_USER_NAME = "USER_NAME";
    public static final String USER_FIELD_PASSWORD = "PASSWORD";
    public static final String USER_FIELD_USER_ID = "USER_ID";
+   public static final String USER_FIELD_ACTIVATION_ID = "ACTIVATION_ID";
    public static final String USER_FIELD_ENABLED = "ENABLED";
    public static final String USER_FIELD_NON_EXPIRED = "NON_EXPIRED";
    public static final String USER_FIELD_NON_LOCKED = "NON_LOCKED";

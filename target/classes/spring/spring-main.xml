@@ -8,9 +8,11 @@
 	http://www.springframework.org/schema/util
 	http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-	<util:map id="appConfigMap">
-	</util:map>
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations" value="classpath:*/appConfig.properties" />
+	</bean>
 	
+	<import resource="spring-util.xml"/>
 	<import resource="spring-dao.xml"/>
 	<import resource="spring-rest.xml"/>
 	<import resource="spring-security.xml"/>

@@ -10,12 +10,14 @@ import com.app.spring.dbmap.UserDataRowMapper;
 import com.app.spring.service.Constants;
 import com.app.spring.service.ServiceException;
 import com.app.spring.service.model.UserData;
-import com.sun.xml.bind.v2.runtime.reflect.opt.Const;
+import com.app.spring.util.UserEmailUtil;
 
 public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServiceDAO {
 
 	private String userSchema;
 	private String userRolesSchema;
+	
+	private UserEmailUtil userEmailUtil;
 	
 	private Logger log;
 
@@ -30,45 +32,9 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 	public void setUserRolesSchema(String pUserRolesSchema) {
 		this.userRolesSchema = pUserRolesSchema;
 	}
-	
-	public String getSQLSelectEmail() {
-		return "select " + Constants.USER_FIELD_EMAIL +
-			" from " + this.userSchema + " where " + Constants.USER_FIELD_EMAIL + " = ?";  
-	}
-	
-	public String getSQLSelectUser() {
-		return "select " + Constants.USER_FIELD_USER_NAME + ", " +
-			Constants.USER_FIELD_EMAIL + ", " +
-			Constants.USER_FIELD_FIRST_NAME + ", " +
-			Constants.USER_FIELD_LAST_NAME +
-			" from " + this.userSchema + " where " + Constants.USER_FIELD_USER_ID + " = ?";
-	}
-	
-	public String getSQLInsertNewUser() {
-		return "insert into " + this.userSchema +
-			"(" + Constants.USER_FIELD_USER_NAME + ", " + 
-			Constants.USER_FIELD_PASSWORD + ", " + 
-			Constants.USER_FIELD_FIRST_NAME + ", " + 
-			Constants.USER_FIELD_LAST_NAME + ", " + 
-			Constants.USER_FIELD_EMAIL + ", " +
-			Constants.USER_FIELD_ENABLED + ", " +
-			Constants.USER_FIELD_NON_EXPIRED + ", " +
-			Constants.USER_FIELD_NON_LOCKED + ", " +
-			Constants.USER_FIELD_NON_CRED_EXPIRED + ") values " +
-			"(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	}
-	
-	public String getSQLInsertUserAuthority() {
-		return "insert into " + this.userRolesSchema +
-			"(" + Constants.USER_FIELD_USER_ID + ", " + 
-			Constants.USER_ROLE_FIELD_AUTH + ") values" +
-			"(?, ?)";
-	}
-	
-	public String getSQLSelectUserId() {
-		return "select " + Constants.USER_FIELD_USER_ID +
-			" from " + this.userSchema + " where " + 
-			Constants.USER_FIELD_USER_NAME + " = ?";
+
+	public void setUserEmailUtil(UserEmailUtil pUserEmailUtil) {
+		this.userEmailUtil = pUserEmailUtil;
 	}
 	
 	public void setDataSource(DataSource pDataSource) {
@@ -89,7 +55,7 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 		
 		return email;
 	}
-	
+
 	@Override
 	public int validateUserName(String pUserName) throws ServiceException {
 		int userId = 0;
@@ -107,13 +73,14 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 	public void createUser(UserData pUserData) throws ServiceException {
 		try {
 			this.getJdbcTemplate().update(this.getSQLInsertNewUser(), new Object[] {pUserData.getUserName(), pUserData.getHashedPassword(),
-					pUserData.getFirstName(), pUserData.getLastName(), pUserData.getEmail(), Constants.DB_VALUE_FALSE, Constants.DB_VALUE_TRUE,
-					Constants.DB_VALUE_TRUE, Constants.DB_VALUE_TRUE});
+				 	pUserData.getHashedActivationId(), pUserData.getFirstName(), pUserData.getLastName(), pUserData.getEmail(), 
+				 	Constants.DB_VALUE_FALSE, Constants.DB_VALUE_TRUE, Constants.DB_VALUE_TRUE, Constants.DB_VALUE_TRUE});
 			
 			int userId = this.getUserId(pUserData.getUserName());
 			
 			if(userId > 0) {
 				this.getJdbcTemplate().update(this.getSQLInsertUserAuthority(), new Object[] {userId, Constants.USER_ROLE_VALUE_GENERAL});
+				this.userEmailUtil.sendActivateUserEmail(pUserData.getEmail(), userId, pUserData.getUserName(), pUserData.getHashedActivationId());
 			} 
 			
 		} catch (DuplicateKeyException anEx) {
@@ -123,14 +90,6 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 			getLog().error(anEx.getMessage());
 			throw new ServiceException(Constants.RESPONSE_CODE_ERROR, Constants.RESPONSE_MESSAGE_SYSTEM_ERROR);
 		}
-	}
-
-	private int getUserId(String pUserName) throws Exception {
-		return this.getJdbcTemplate().queryForInt(this.getSQLSelectUserId(), new Object[]{pUserName});
-	}
-		
-	private String getEmail(String pEmail) throws Exception {
-		return (String) this.getJdbcTemplate().queryForObject(this.getSQLSelectEmail(), new Object[]{pEmail}, String.class);
 	}
 	
 	@Override
@@ -149,8 +108,57 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 		
 		return user;
 	}
+
+	private int getUserId(String pUserName) throws Exception {
+		return this.getJdbcTemplate().queryForInt(this.getSQLSelectUserId(), new Object[]{pUserName});
+	}
+		
+	private String getEmail(String pEmail) throws Exception {
+		return (String) this.getJdbcTemplate().queryForObject(this.getSQLSelectEmail(), new Object[]{pEmail}, String.class);
+	}
 	
 	public Logger getLog() {
 		return this.log;
+	}
+	
+	public String getSQLSelectEmail() {
+		return "select " + Constants.USER_FIELD_EMAIL +
+			" from " + this.userSchema + " where " + Constants.USER_FIELD_EMAIL + " = ?";  
+	}
+	
+	public String getSQLSelectUser() {
+		return "select " + Constants.USER_FIELD_USER_NAME + ", " +
+			Constants.USER_FIELD_EMAIL + ", " +
+			Constants.USER_FIELD_FIRST_NAME + ", " +
+			Constants.USER_FIELD_LAST_NAME +
+			" from " + this.userSchema + " where " + Constants.USER_FIELD_USER_ID + " = ?";
+	}
+	
+	public String getSQLInsertNewUser() {
+		return "insert into " + this.userSchema +
+			"(" + Constants.USER_FIELD_USER_NAME + ", " + 
+			Constants.USER_FIELD_PASSWORD + ", " + 
+			Constants.USER_FIELD_ACTIVATION_ID + ", " +
+			Constants.USER_FIELD_FIRST_NAME + ", " + 
+			Constants.USER_FIELD_LAST_NAME + ", " + 
+			Constants.USER_FIELD_EMAIL + ", " +
+			Constants.USER_FIELD_ENABLED + ", " +
+			Constants.USER_FIELD_NON_EXPIRED + ", " +
+			Constants.USER_FIELD_NON_LOCKED + ", " +
+			Constants.USER_FIELD_NON_CRED_EXPIRED + ") values " +
+			"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	}
+	
+	public String getSQLInsertUserAuthority() {
+		return "insert into " + this.userRolesSchema +
+			"(" + Constants.USER_FIELD_USER_ID + ", " + 
+			Constants.USER_ROLE_FIELD_AUTH + ") values" +
+			"(?, ?)";
+	}
+	
+	public String getSQLSelectUserId() {
+		return "select " + Constants.USER_FIELD_USER_ID +
+			" from " + this.userSchema + " where " + 
+			Constants.USER_FIELD_USER_NAME + " = ?";
 	}
 }

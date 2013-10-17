@@ -7,6 +7,7 @@ public class UserData {
 	private String firstName;
 	private String lastName;
 	private String hashedPassword;
+	private String hashedActivationId;
 	
 	public UserData(String pUserName, String pEmail, String pFirstName, String pLastName) {
 		this.userName = pUserName;
@@ -14,6 +15,14 @@ public class UserData {
 		this.lastName = pLastName;
 		this.email = pEmail;
    }
+	
+	public String getHashedActivationId() {
+		return hashedActivationId;
+	}
+
+	public void setHashedActivationId(String hashedActivationId) {
+		this.hashedActivationId = hashedActivationId;
+	}
 
 	public void setHashedPassword(String pHashedPassword) {
 		this.hashedPassword = pHashedPassword;

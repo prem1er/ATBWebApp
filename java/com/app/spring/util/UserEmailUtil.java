@@ -2,11 +2,15 @@ package com.app.spring.util;
 
 import java.util.Properties;
 
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
@@ -14,7 +18,6 @@ import org.apache.log4j.Logger;
 
 import com.app.spring.service.Constants;
 import com.app.spring.service.ServiceException;
-import com.sun.jersey.api.MessageException;
 
 public class UserEmailUtil {
     private String emailPass;
@@ -28,7 +31,7 @@ public class UserEmailUtil {
     private String PROP_MAIL_TLS_NAME = "mail.smtp.starttls.enable";
     private String PROP_MAIL_FROM_NAME = "mail.smtp.user";
 
-    private String PROP_MAIL_FROM_VALUE = "no-reply@afterthebeep.us";
+    private String PROP_MAIL_FROM_VALUE = "noreply@afterthebeep.us";
 
     private Logger log;
 
@@ -57,17 +60,26 @@ public class UserEmailUtil {
         return session;              
     }       
 
-    protected void sendActivateUserEmail(String pUserEmail, int pUserId, String pUserName) throws ServiceException {
+    public void sendActivateUserEmail(String pUserEmail, int pUserId, String pUserName, String pActivationId) throws ServiceException {
         try {
-            getLog().info("Calling sendActivateUserEmail; [Email Address: " + pUserEmail + " User Id: " + pUserId + "]"); 
+            getLog().info("Calling sendActivateUserEmail; [Email Address: " + pUserEmail + "; User Id: " + pUserId + "; Activation ID: " + pActivationId + "]"); 
 
-            MimeMessage message = new MimeMessage(this.getMailSession());
+            MimeMessage message = new MimeMessage(this.getMailSession());          
             message.setFrom(new InternetAddress(PROP_MAIL_FROM_VALUE));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(pUserEmail));
             message.setSubject("Action required to activate user at afterthebeep");
-            message.setText("Thanks for registering with afterthebeep. Follow the below link to activate your account \n" +
-            		"for username: " + pUserName + "\n \n" +
-            		 "<a href=http://afterthebeep.us/activate.jsp?uid=" + pUserId + ">", "UTF-8", "html");
+            
+            Multipart multipart = new MimeMultipart();
+            BodyPart htmlPart = new MimeBodyPart();
+            htmlPart.setContent("Thanks for registering with afterthebeep. " +
+            		"Follow the below link to activate your account for username: " + pUserName + 
+            		"<br><br><a href=\"http://afterthebeep.us/activate.jsp?uid=" + pUserId + "&aid=" + pActivationId + "\">" + 
+            		"http://afterthebeep.us/activate.jsp?uid=" + pUserId + "&aid=" + pActivationId + 
+            		"</a>", "text/html; charset=ISO-8859-1");
+            
+            multipart.addBodyPart(htmlPart);
+            message.setContent(multipart);
+            Transport.send(message);
             
         } catch (MessagingException anEx) {
             getLog().error(anEx.getMessage());

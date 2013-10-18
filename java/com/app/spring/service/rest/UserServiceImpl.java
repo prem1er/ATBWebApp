@@ -1,11 +1,14 @@
 package com.app.spring.service.rest;
 
 import org.apache.log4j.Logger;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.app.spring.service.Constants;
 import com.app.spring.service.ServiceException;
 import com.app.spring.service.dao.UserServiceDAO;
+import com.app.spring.service.model.AuthenticatedUser;
 import com.app.spring.service.model.ResponseBase;
 import com.app.spring.service.model.ResponseUserData;
 import com.app.spring.service.model.UserData;
@@ -23,20 +26,27 @@ public class UserServiceImpl implements UserService {
 	}
 
     @Override
-	public ResponseUserData getUserInfo(String pUserId) {
-	    getLog().info("Calling service: getUserInfo; [User ID: " + pUserId + "]");
-	   
-	   	ResponseUserData response = new ResponseUserData();
-	   	UserData user = null;
-		try {
-			user = this.getUserServiceDAO().getUserInfo(pUserId);
-			getLog().info("End call: getUserInfo");
-			
-			response.setUser(user);
-			response.setResponseOk();
-		} catch(ServiceException anEx) {
-			response.setResponseError(anEx.getMessage());
-		}
+	public ResponseUserData getUserInfo() {
+    	ResponseUserData response = new ResponseUserData();
+    	
+	    AuthenticatedUser authUser = (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	    String userId = authUser.getUserId();
+	    
+	    if (userId != null && userId.length() > 0) {
+	    	getLog().info("Calling service: getUserInfo; [User ID: " + userId + "]");
+	 	   
+		   	UserData user = null;
+		   	
+			try {
+				user = this.getUserServiceDAO().getUserInfo(userId);
+				getLog().info("End call: getUserInfo");
+				
+				response.setUser(user);
+				response.setResponseOk();
+			} catch(ServiceException anEx) {
+				response.setResponseError(anEx.getMessage());
+			}
+	    }
 		
 		return response;
 	}
@@ -116,7 +126,24 @@ public class UserServiceImpl implements UserService {
 		return response;
 	}
 	
-    public UserEmailUtil getUserEmailUtil() {
+    @Override
+	public ResponseBase activateUser(String pUserId, String pActivationId) {
+		ResponseBase response = new ResponseBase();
+		
+		try{
+			this.getUserServiceDAO().activateUser(pUserId, pActivationId);
+			
+			response.setResponseCode(Constants.RESPONSE_CODE_OK);
+			response.setSuccess(true);
+			response.setResponseMessage("TODO: Activation successful. Include link to login page.");
+		} catch(ServiceException anEx) {
+			getLog().error(anEx.getMessage());
+			response.setResponseError(anEx.getMessage());
+		}
+		return response;
+	}
+
+	public UserEmailUtil getUserEmailUtil() {
 		return this.userEmailUtil;
 	}
 

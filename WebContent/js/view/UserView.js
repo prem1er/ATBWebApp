@@ -1,5 +1,5 @@
 Ext.onReady(function() {
-	var restUrl = Ext.create('js.util.Config').getProdRestUrl();
+	var restUrl = Ext.create('js.util.Config').getDevRestUrl();
 	
 	var userViewStore = Ext.create('Ext.data.Store', {
 	    model: 'js.model.UserData',

@@ -12,4 +12,6 @@ public interface UserServiceDAO extends ServiceBaseDAO {
 	public int validateUserName(String pUserName) throws ServiceException;
 	
 	public String validateEmail(String pEmail) throws ServiceException;
+	
+	public void activateUser(String pUserId, String pActivationId) throws ServiceException;
 }

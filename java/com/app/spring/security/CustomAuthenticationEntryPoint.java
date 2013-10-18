@@ -38,7 +38,7 @@ public class CustomAuthenticationEntryPoint extends LoginUrlAuthenticationEntryP
 			OutputStream out = pResponse.getOutputStream();
 			mapper.writeValue(out, responseBase);
 		} else {
-			this.log.info("Non-Authenticated Requested; [Requesting IP: " + pRequest.getRemoteAddr() + "]");
+			getLog().info("Non-Authenticated Requested; [Requesting IP: " + pRequest.getRemoteAddr() + "]");
 			super.commence(pRequest, pResponse, pAuthException);
 		}
 	}

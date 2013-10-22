@@ -1,5 +1,5 @@
 Ext.onReady(function() {
-	var restUrl = Ext.create('js.util.Config').getDevRestUrl();
+	var restUrl = Ext.create('js.util.Config').getProdRestUrl();
 	var paramObj = Ext.Object.fromQueryString(document.location.href.split('?')[1]);
 	var userId = paramObj.uid;
 	var activationId = paramObj.aid;

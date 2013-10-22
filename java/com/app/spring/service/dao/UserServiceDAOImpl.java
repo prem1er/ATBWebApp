@@ -98,7 +98,7 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 		UserData user = null;
 		
 		try {
-			user = getJdbcTemplate().queryForObject(this.getSQLSelectUser(), new UserDataRowMapper(), pUserId);
+			user = this.getJdbcTemplate().queryForObject(this.getSQLSelectUser(), new UserDataRowMapper(), pUserId);
 		} catch (EmptyResultDataAccessException anEx) {
 			getLog().equals("Invalid User ID .. " + anEx.getMessage());
 			throw new ServiceException(Constants.RESPONSE_CODE_ERROR, Constants.RESPONSE_MESSAGE_SYSTEM_ERROR);
@@ -115,11 +115,11 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 		UserData user = null;
 		
 		try {
-			user = (UserData) this.getJdbcTemplate().queryForObject(this.getSQLSelectUser(), new UserActivationDataRowMapper(), pUserId);	
+			user = this.getJdbcTemplate().queryForObject(this.getSQLSelectUser(), new UserActivationDataRowMapper(), Integer.parseInt(pUserId));	
 			
 			if(!user.isUserEnabled()) {
 				if(pActivationId.equals(user.getHashedActivationId())) {
-					this.getJdbcTemplate().update(this.getSQLUpdateActivateUser(), new Object[] {user.getUserId(), Constants.DB_VALUE_TRUE});
+					this.getJdbcTemplate().update(this.getSQLUpdateActivateUser(), new Object[] {user.getUserId()});
 				} else {
 					throw new ServiceException(Constants.RESPONSE_CODE_UNAUTHORIZED, "TODO: Attempt to register user without propert activation ID.");
 				}
@@ -152,7 +152,7 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 	public String getSQLUpdateActivateUser() {
 		return "update " + this.userSchema + 
 			" set " + Constants.USER_FIELD_ENABLED + " = " + Constants.DB_VALUE_TRUE +
-			" where " + Constants.USER_FIELD_USER_ID + " =  ?";
+			" where " + Constants.USER_FIELD_USER_ID + " = ?";
 	}
 	
 	public String getSQLSelectEmail() {
@@ -166,7 +166,8 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 			Constants.USER_FIELD_EMAIL + ", " +
 			Constants.USER_FIELD_FIRST_NAME + ", " +
 			Constants.USER_FIELD_LAST_NAME + ", " +
-			Constants.USER_FIELD_ENABLED + 
+			Constants.USER_FIELD_ENABLED + ", " + 
+			Constants.USER_FIELD_USER_ID + 
 			" from " + this.userSchema + " where " + Constants.USER_FIELD_USER_ID + " = ?";
 	}
 	

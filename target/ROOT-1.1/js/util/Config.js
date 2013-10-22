@@ -1,7 +1,7 @@
 Ext.define('js.util.Config', {
 	config: {
 		devRestUrl: 'http://localhost:8080/rest',
-		prodRestUrl: 'http://localhost/rest',
+		prodRestUrl: 'http://afterthebeep.us/rest',
 	},
 	
 	getDevRestUrl: function() {
@@ -10,5 +10,9 @@ Ext.define('js.util.Config', {
 	
 	getProdRestUrl: function() {
 		return this.prodRestUrl;
+	},
+	
+	getServerHost: function() {
+		
 	}
 });

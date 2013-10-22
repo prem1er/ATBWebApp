@@ -1,13 +1,15 @@
 Ext.onReady(function() {
-	var restUrl = Ext.create('js.util.Config').getProdRestURL();
-	var userId = Ext.Object.fromQueryString(document.location.href.split('?')[0]);
+	var restUrl = Ext.create('js.util.Config').getProdRestUrl();
+	var paramObj = Ext.Object.fromQueryString(document.location.href.split('?')[1]);
+	var userId = paramObj.uid;
+	var activationId = paramObj.aid;
 	
-	if(userId.length > 0) {
-		Ext.ajax.request({
+	if(userId.length > 0 && activationId.length > 0) {
+		Ext.Ajax.request({
 			url: restUrl + '/userservice/activateUser',
 			method: 'POST',
 			scope: this,
-			params: {userId: userId},
+			params: {userId: userId, activationId: activationId},
 			success: function(response, request) {
 				var jsonObj = Ext.decode(response.responseText);
 				var responseCode = jsonObj.responseCode;
@@ -22,6 +24,6 @@ Ext.onReady(function() {
 			}
 		});
 	} {
-		Ext.Msg.alert('Error', 'No User ID found');
+		Ext.Msg.alert('Error', 'TODO: invalid parameter list. send to error page.');
 	}
 });

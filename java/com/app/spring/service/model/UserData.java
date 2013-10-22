@@ -1,6 +1,5 @@
 package com.app.spring.service.model;
 
-import sun.java2d.pisces.PiscesRenderingEngine;
 
 public class UserData {
 

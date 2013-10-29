@@ -29,6 +29,6 @@
 	    <property name="userSchema" value="${jdbc.userSchema}" />
 	    <property name="userRolesSchema" value="${jdbc.userRolesSchema}" />
 	    <property name="dataSource" ref="dataSource" />
-	    <property name="userEmailUtil" ref="userEmailUtil"></property>
+	    <property name="userEmailUtil" ref="emailUtil"></property>
 	</bean>
 </beans>

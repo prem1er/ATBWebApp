@@ -8,7 +8,7 @@
 	http://www.springframework.org/schema/util
 	http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 	
-    <bean class="com.app.spring.util.UserEmailUtil" id="userEmailUtil">
+    <bean class="com.app.spring.util.EmailUtil" id="emailUtil">
 		<constructor-arg name="pEmailUser" value="${email.user}" />
 		<constructor-arg name="pEmailPass" value="${email.password}" />
 		<constructor-arg name="pEmailHost" value="${email.host}" />

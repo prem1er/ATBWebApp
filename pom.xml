@@ -45,7 +45,6 @@
       		<groupId>org.jasypt</groupId>
       		<artifactId>jasypt</artifactId>
       		<version>1.9.1</version>
-      		<classifier>lite</classifier>
    	 	</dependency>
 	
 		<!-- Spring -->

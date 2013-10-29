@@ -33,7 +33,7 @@
 	    <security:intercept-url pattern="/resources/**" access="permitAll" />
 	    <security:intercept-url pattern="/js/**" access="permitAll" />
 	    <security:intercept-url pattern="/rest/**" access="isAuthenticated()" />
-	    <security:intercept-url pattern="/**" access="isAuthenticated()" />
+	    <security:intercept-url pattern="/*" access="isAuthenticated()" />
 		<security:form-login login-page="/login.jsp" 
 			authentication-success-handler-ref="loginSuccessHandler"
 			authentication-failure-handler-ref="loginFailureHandler"  />

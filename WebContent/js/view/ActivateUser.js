@@ -1,5 +1,5 @@
 Ext.onReady(function() {
-	var restUrl = Ext.create('js.util.Config').getProdRestUrl();
+	var restUrl = Ext.create('js.util.Config').getDevRestUrl();
 	var paramObj = Ext.Object.fromQueryString(document.location.href.split('?')[1]);
 	var userId = paramObj.uid;
 	var activationId = paramObj.aid;
@@ -23,7 +23,7 @@ Ext.onReady(function() {
 				Ext.Msg.alert('Error', 'System communication error');
 			}
 		});
-	} {
+	} else {
 		Ext.Msg.alert('Error', 'TODO: invalid parameter list. send to error page.');
 	}
 });

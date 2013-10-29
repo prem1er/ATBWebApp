@@ -11,12 +11,13 @@ import com.app.spring.service.model.AuthenticatedUser;
 import com.app.spring.service.model.ResponseBase;
 import com.app.spring.service.model.ResponseUserData;
 import com.app.spring.service.model.UserData;
-import com.app.spring.util.UserEmailUtil;
+import com.app.spring.util.AuthenticatedUserUtil;
+import com.app.spring.util.EmailUtil;
 
 public class UserServiceImpl implements UserService {
    
 	private UserServiceDAO userServiceDAO;
-	private UserEmailUtil userEmailUtil;
+	private EmailUtil userEmailUtil;
 	
 	private Logger log;
 	
@@ -27,26 +28,30 @@ public class UserServiceImpl implements UserService {
     @Override
 	public ResponseUserData getUserInfo() {
     	ResponseUserData response = new ResponseUserData();
-    	
-	    AuthenticatedUser authUser = (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	    String userId = authUser.getUserId();
+	    AuthenticatedUser authUser = AuthenticatedUserUtil.getAuthenticatedUser();
 	    
-	    if (userId != null && userId.length() > 0) {
-	    	getLog().info("Calling service: getUserInfo; [User ID: " + userId + "]");
-	 	   
-		   	UserData user = null;
-		   	
-			try {
-				user = this.getUserServiceDAO().getUserInfo(userId);
-				getLog().info("End call: getUserInfo");
-				
-				response.setUser(user);
-				response.setResponseOk();
-			} catch(ServiceException anEx) {
-				response.setResponseError(anEx.getMessage());
-			}
+	    if(authUser != null) {
+		    String userId = authUser.getUserId();
+		    
+		    if (userId != null && userId.length() > 0) {
+		    	getLog().info("Calling service: getUserInfo; [User ID: " + userId + "]");
+		 	   
+			   	UserData user = null;
+			   	
+				try {
+					user = this.getUserServiceDAO().getUserInfo(userId);
+					getLog().info("End call: getUserInfo");
+					
+					response.setUser(user);
+					response.setResponseOk();
+				} catch(ServiceException anEx) {
+					response.setResponseError(anEx.getMessage());
+				}
+		    }
+	    } else {
+	    	response.setResponseError("Error retrieving an authenticated user.");
 	    }
-		
+
 		return response;
 	}
 
@@ -72,7 +77,7 @@ public class UserServiceImpl implements UserService {
 			getLog().info("End call: createUser");
 			
 			response.setResponseCode(Constants.RESPONSE_CODE_OK);
-			response.setResponseMessage("User created successfully. An activation email was sent.");
+			response.setResponseMessage("User created successfully. An activation email was sent to " + pEmail + ".");
 		} catch(ServiceException anEx) {
 			response.setResponseError(anEx.getMessage());
 		}
@@ -142,11 +147,11 @@ public class UserServiceImpl implements UserService {
 		return response;
 	}
 
-	public UserEmailUtil getUserEmailUtil() {
+	public EmailUtil getUserEmailUtil() {
 		return this.userEmailUtil;
 	}
 
-	public void setUserEmailUtil(UserEmailUtil userEmailUtil) {
+	public void setUserEmailUtil(EmailUtil userEmailUtil) {
 		this.userEmailUtil = userEmailUtil;
 	}
 

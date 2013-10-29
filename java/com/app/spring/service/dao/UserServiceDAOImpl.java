@@ -11,14 +11,14 @@ import com.app.spring.dbmap.UserDataRowMapper;
 import com.app.spring.service.Constants;
 import com.app.spring.service.ServiceException;
 import com.app.spring.service.model.UserData;
-import com.app.spring.util.UserEmailUtil;
+import com.app.spring.util.EmailUtil;
 
 public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServiceDAO {
 
 	private String userSchema;
 	private String userRolesSchema;
 	
-	private UserEmailUtil userEmailUtil;
+	private EmailUtil userEmailUtil;
 	
 	private Logger log;
 
@@ -34,7 +34,7 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 		this.userRolesSchema = pUserRolesSchema;
 	}
 
-	public void setUserEmailUtil(UserEmailUtil pUserEmailUtil) {
+	public void setUserEmailUtil(EmailUtil pUserEmailUtil) {
 		this.userEmailUtil = pUserEmailUtil;
 	}
 	
@@ -121,7 +121,7 @@ public class UserServiceDAOImpl extends ServiceBaseDAOImpl implements UserServic
 				if(pActivationId.equals(user.getHashedActivationId())) {
 					this.getJdbcTemplate().update(this.getSQLUpdateActivateUser(), new Object[] {user.getUserId()});
 				} else {
-					throw new ServiceException(Constants.RESPONSE_CODE_UNAUTHORIZED, "TODO: Attempt to register user without propert activation ID.");
+					throw new ServiceException(Constants.RESPONSE_CODE_UNAUTHORIZED, "TODO: Attempt to register user without proper activation ID.");
 				}
 			} else {
 				throw new ServiceException(Constants.RESPONSE_CODE_UNAUTHORIZED, "TODO: User is already activated. Send to login page");

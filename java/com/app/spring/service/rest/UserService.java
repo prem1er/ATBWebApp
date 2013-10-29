@@ -7,6 +7,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.app.spring.service.model.ResponseBase;
 import com.app.spring.service.model.ResponseUserData;
 
@@ -27,7 +29,7 @@ public interface UserService {
      @Path("/getUserInfo")
      @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
      @Produces(MediaType.APPLICATION_JSON)
-     //@PreAuthorize("hasRole('ROLE_USER')")
+     @PreAuthorize("hasRole('ROLE_USER')")
      public ResponseUserData getUserInfo();
      
      @POST
